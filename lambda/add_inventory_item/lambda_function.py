@@ -42,4 +42,4 @@ def lambda_handler(event, context):
         }
     
 
-# Comment to check if lambda deploy worked
+# Comment to check if lambda deploy worked.
