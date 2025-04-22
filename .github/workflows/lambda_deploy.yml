@@ -5,7 +5,11 @@ on:
     branches:
       - "main"
     paths:
+      - "lambda/get_location_inventory_items/lambda_function.py"
+      - "lambda/add_inventory_item/lambda_function.py"
       - "lambda/get_all_inventory_items/lambda_function.py"
+      - "lambda/delete_inventory_item/lambda_function.py"
+      - "lambda/get_inventory_item/lambda_function.py"
 
 jobs:
   deploy:
@@ -13,6 +17,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set AWS credentials
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
@@ -20,12 +25,43 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: us-east-1
-      - name: Zip the get_all_inventory_items Lambda function
-        run: zip function.zip lambda_function.py
+
+      - name: Deploy get_location_inventory_items
+        if: contains(github.event.head_commit.message, 'get_location_inventory_items') || github.event.head_commit.modified && contains(join(github.event.head_commit.modified, ','), 'lambda/get_location_inventory_items/lambda_function.py')
+        working-directory: ./lambda/get_location_inventory_items
+        run: |
+          zip function.zip lambda_function.py
+          aws lambda update-function-code --function-name get_location_inventory_items --zip-file fileb://function.zip --publish
+          rm function.zip
+
+      - name: Deploy add_inventory_item
+        if: contains(github.event.head_commit.message, 'add_inventory_item') || github.event.head_commit.modified && contains(join(github.event.head_commit.modified, ','), 'lambda/add_inventory_item/lambda_function.py')
+        working-directory: ./lambda/add_inventory_item
+        run: |
+          zip function.zip lambda_function.py
+          aws lambda update-function-code --function-name add_inventory_item --zip-file fileb://function.zip --publish
+          rm function.zip
+
+      - name: Deploy get_all_inventory_items
+        if: contains(github.event.head_commit.message, 'get_all_inventory_items') || github.event.head_commit.modified && contains(join(github.event.head_commit.modified, ','), 'lambda/get_all_inventory_items/lambda_function.py')
         working-directory: ./lambda/get_all_inventory_items
-      - name: Update Lambda function code
-        run: aws lambda update-function-code --function-name get_all_inventory_items --zip-file fileb://function.zip --publish
-        working-directory: ./lambda/get_all_inventory_items
-      - name: Cleanup get_all_inventory_items zip
-        run: rm function.zip
-        working-directory: ./lambda/get_all_inventory_items
+        run: |
+          zip function.zip lambda_function.py
+          aws lambda update-function-code --function-name get_all_inventory_items --zip-file fileb://function.zip --publish
+          rm function.zip
+
+      - name: Deploy delete_inventory_item
+        if: contains(github.event.head_commit.message, 'delete_inventory_item') || github.event.head_commit.modified && contains(join(github.event.head_commit.modified, ','), 'lambda/delete_inventory_item/lambda_function.py')
+        working-directory: ./lambda/delete_inventory_item
+        run: |
+          zip function.zip lambda_function.py
+          aws lambda update-function-code --function-name delete_inventory_item --zip-file fileb://function.zip --publish
+          rm function.zip
+
+      - name: Deploy get_inventory_item
+        if: contains(github.event.head_commit.message, 'get_inventory_item') || github.event.head_commit.modified && contains(join(github.event.head_commit.modified, ','), 'lambda/get_inventory_item/lambda_function.py')
+        working-directory: ./lambda/get_inventory_item
+        run: |
+          zip function.zip lambda_function.py
+          aws lambda update-function-code --function-name get_inventory_item --zip-file fileb://function.zip --publish
+          rm function.zip
