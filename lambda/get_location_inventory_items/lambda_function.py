@@ -53,4 +53,4 @@ def lambda_handler(event, context):
         'body': json.dumps(items)
     }
 
-# Comment to check if lambda deploy worked
+# Comment to check if lambda deploy worked.

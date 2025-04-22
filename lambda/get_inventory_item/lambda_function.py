@@ -44,4 +44,4 @@ def lambda_handler(event, context):
             'body': json.dumps(f"Error fetching item: {e.response['Error']['Message']}")
         }
 
-# Comment to check if lambda deploy worked
+# Comment to check if lambda deploy worked.
